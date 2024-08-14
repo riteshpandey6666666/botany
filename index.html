@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz on Classification of Life Forms</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        #timer {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .question {
+            margin-bottom: 15px;
+        }
+        .options {
+            margin: 10px 0;
+        }
+        .option {
+            margin-right: 10px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Quiz: Classification of Life Forms</h1>
+        <div id="timer"></div>
+        <form id="quizForm">
+            <!-- Questions will be dynamically inserted here -->
+        </form>
+        <button class="btn" onclick="submitQuiz()">Submit Quiz</button>
+        <div id="results">
+            <h2>Quiz Results</h2>
+            <p id="score"></p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Which kingdom includes organisms with prokaryotic cells and no membrane-bound organelles?",
+                options: ["A) Monera", "B) Protista", "C) Fungi", "D) Plantae"],
+                answer: "A"
+            },
+            {
+                question: "Which of the following kingdoms primarily consists of multicellular, eukaryotic organisms that are autotrophic?",
+                options: ["A) Protista", "B) Fungi", "C) Plantae", "D) Animalia"],
+                answer: "C"
+            },
+            {
+                question: "What is the primary mode of nutrition for organisms in the Fungi kingdom?",
+                options: ["A) Photosynthesis", "B) Ingestion", "C) Absorption", "D) Chemosynthesis"],
+                answer: "C"
+            },
+            {
+                question: "Which of the following is NOT a characteristic of the kingdom Animalia?",
+                options: ["A) Eukaryotic cells", "B) Cell walls made of cellulose", "C) Multicellular", "D) Heterotrophic"],
+                answer: "B"
+            },
+            {
+                question: "Which group of bacteria is characterized by having a thick peptidoglycan layer in their cell walls?",
+                options: ["A) Gram-positive bacteria", "B) Gram-negative bacteria", "C) Cyanobacteria", "D) Archaea"],
+                answer: "A"
+            },
+            {
+                question: "Which of the following is an example of a cyanobacterium?",
+                options: ["A) Escherichia coli", "B) Nostoc", "C) Staphylococcus", "D) Bacillus"],
+                answer: "B"
+            },
+            {
+                question: "Which group of Protista is known for being primarily heterotrophic and motile?",
+                options: ["A) Algae", "B) Protozoans", "C) Slime molds", "D) Euglenoids"],
+                answer: "B"
+            },
+            {
+                question: "Which of the following is a characteristic feature of brown algae?",
+                options: ["A) Red pigments", "B) Green pigments", "C) Brown pigments", "D) No pigments"],
+                answer: "C"
+            },
+            {
+                question: "Which group of fungi produces spores in a sac-like structure called an ascus?",
+                options: ["A) Basidiomycetes", "B) Ascomycetes", "C) Zygomycetes", "D) Chytridiomycetes"],
+                answer: "B"
+            },
+            {
+                question: "What is the common name for fungi in the Basidiomycetes group?",
+                options: ["A) Molds", "B) Yeasts", "C) Mushrooms", "D) Rusts"],
+                answer: "C"
+            },
+            {
+                question: "Which of the following is a type of lichen characterized by a leaf-like appearance?",
+                options: ["A) Crustose", "B) Foliose", "C) Fruticose", "D) Mycorrhizal"],
+                answer: "B"
+            },
+            {
+                question: "Lichens are a symbiotic association between which of the following?",
+                options: ["A) Bacteria and algae", "B) Fungi and plants", "C) Fungi and algae or cyanobacteria", "D) Protists and bacteria"],
+                answer: "C"
+            },
+            {
+                question: "Which of the following is true about viruses?",
+                options: ["A) They have a cellular structure.", "B) They can reproduce independently.", "C) They consist of nucleic acid surrounded by a protein coat.", "D) They are classified as living organisms."],
+                answer: "C"
+            },
+            {
+                question: "Which of the following is NOT a characteristic of viroids?",
+                options: ["A) They lack a protein coat.", "B) They consist of RNA only.", "C) They are larger than viruses.", "D) They cause plant diseases."],
+                answer: "C"
+            },
+            {
+                question: "The phenomenon where a virus integrates its genetic material into the host genome is known as:",
+                options: ["A) Lytic cycle", "B) Lysogenic cycle", "C) Transformation", "D) Conjugation"],
+                answer: "B"
+            }
+        ];
+
+        let timerDuration = 30 * 60; // 30 minutes in seconds
+        let timerInterval;
+
+        function loadQuiz() {
+            const quizForm = document.getElementById('quizForm');
+            questions.forEach((q, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.classList.add('question');
+                questionElement.innerHTML = `
+                    <p><strong>Q${index + 1}: ${q.question}</strong></p>
+                    <div class="options">
+                        ${q.options.map((opt) => `
+                            <label>
+                                <input type="radio" name="q${index}" value="${opt.charAt(0)}" class="option">
+                                ${opt}
+                            </label><br>
+                        `).join('')}
+                    </div>
+                `;
+                quizForm.appendChild(questionElement);
+            });
+            startTimer();
+        }
+
+        function startTimer() {
+            const timerDisplay = document.getElementById('timer');
+            
+            function updateTimer() {
+                const minutes = Math.floor(timerDuration / 60);
+                const seconds = timerDuration % 60;
+                timerDisplay.textContent = `Time remaining: ${minutes}m ${seconds}s`;
+
+                if (timerDuration <= 0) {
+                    clearInterval(timerInterval);
+                    submitQuiz(); // Automatically submit quiz when time is up
+                } else {
+                    timerDuration--;
+                }
+            }
+
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer(); // Initial call to display the timer immediately
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            const formData = new FormData(document.getElementById('quizForm'));
+            const correctAnswers = questions.map(q => q.answer);
+
+            formData.forEach((value, key) => {
+                const questionIndex = parseInt(key.substring(1)) - 1;
+                if (value === correctAnswers[questionIndex]) {
+                    score += 4;
+                } else if (value) {
+                    score -= 1;
+                }
+            });
+
+            document.getElementById('score').textContent = `Your total score is: ${score}`;
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('quizForm').style.display = 'none'; // Hide the quiz form after submission
+        }
+
+        window.onload = loadQuiz;
+    </script>
+</body>
+</html>
